@@ -128,11 +128,29 @@
         "ai-commit.AI_PROVIDER": {
           "type": "string",
           "default": "openai",
-          "description": "AI Provider to use (OpenAI or Gemini)",
+          "description": "AI Provider to use (OpenAI, Gemini, or Groq)",
           "enum": [
             "openai",
-            "gemini"
+            "gemini",
+            "groq"
           ]
+        },
+        "ai-commit.GROQ_API_KEY": {
+          "type": "string",
+          "default": "",
+          "description": "Groq API Key"
+        },
+        "ai-commit.GROQ_MODEL": {
+          "type": "string",
+          "default": "llama-3.3-70b-versatile",
+          "description": "Groq Model to use"
+        },
+        "ai-commit.GROQ_TEMPERATURE": {
+          "type": "number",
+          "default": 0.7,
+          "minimum": 0,
+          "maximum": 2,
+          "description": "Groq temperature setting (0-2). Controls randomness."
         },
         "ai-commit.GEMINI_API_KEY": {
           "type": "string",

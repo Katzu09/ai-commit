@@ -7,6 +7,7 @@ import { ChatGPTAPI } from './openai-utils';
 import { getMainCommitPrompt } from './prompts';
 import { ProgressHandler } from './utils';
 import { GeminiAPI } from './gemini-utils';
+import { GroqAPI } from './groq-utils';
 
 /**
  * Generates a chat completion prompt for the commit message based on the provided diff.
@@ -111,18 +112,27 @@ export async function generateCommitMsg(arg) {
       try {
         let commitMessage: string | undefined;
 
-        if (aiProvider === 'gemini') {
-          const geminiApiKey = configManager.getConfig<string>(ConfigKeys.GEMINI_API_KEY);
-          if (!geminiApiKey) {
-            throw new Error('Gemini API Key not configured');
-          }
-          commitMessage = await GeminiAPI(messages);
-        } else {
-          const openaiApiKey = configManager.getConfig<string>(ConfigKeys.OPENAI_API_KEY);
-          if (!openaiApiKey) {
-            throw new Error('OpenAI API Key not configured');
-          }
-          commitMessage = await ChatGPTAPI(messages as ChatCompletionMessageParam[]);
+        switch (aiProvider) {
+          case 'gemini':
+            const geminiApiKey = configManager.getConfig<string>(ConfigKeys.GEMINI_API_KEY);
+            if (!geminiApiKey) {
+              throw new Error('Gemini API Key not configured');
+            }
+            commitMessage = await GeminiAPI(messages);
+            break;
+          case 'groq':
+            const groqApiKey = configManager.getConfig<string>(ConfigKeys.GROQ_API_KEY);
+            if (!groqApiKey) {
+              throw new Error('Groq API Key not configured');
+            }
+            commitMessage = await GroqAPI(messages);
+            break;
+          default:
+            const openaiApiKey = configManager.getConfig<string>(ConfigKeys.OPENAI_API_KEY);
+            if (!openaiApiKey) {
+              throw new Error('OpenAI API Key not configured');
+            }
+            commitMessage = await ChatGPTAPI(messages as ChatCompletionMessageParam[]);
         }
 
 
@@ -151,6 +161,8 @@ export async function generateCommitMsg(arg) {
           }
         } else if (aiProvider === 'gemini') {
           errorMessage = `Gemini API error: ${err.message}`;
+        } else if (aiProvider === 'groq') {
+          errorMessage = `Groq API error: ${err.message}`;
         }
 
         throw new Error(errorMessage);
